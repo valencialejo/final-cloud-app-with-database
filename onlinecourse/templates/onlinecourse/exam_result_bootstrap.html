@@ -39,16 +39,49 @@
     {% if grade > 80 %}
     <div class="alert alert-success">
        <!--HINT Display passed info -->
+       <p><b>Congratulations, {{user.first_name}}! </b>You have passed the exam and completed the course with score {{grade}} / 100</p>
     </div>
         {% else %}
         <div class="alert alert-danger">
             <!--HINT Display failed info -->
+            <p><b>Failed, sorry {{user.first_name}}! </b>You have failed the exam  with score {{grade}} / 100</p>
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
             <!--HINT Display exam results-->
+            {% for lesson in course.lesson_set.all %}
+                {% for question in lesson.question_set.all %}
+                    <div class="card mt-1">
+                        <div class="card-header"><h5>{{ question.question_text}}</h5></div>
+                        {% csrf_token %}
+                        <div class="form-group">
+                        <!--... for each choice in the question ...-->
+                        {% for choice in question.choice_set.all %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    {% if choice.id in selected %}
+                                        {% if choice.is_correct == True %}
+                                            <label style="color:green;font-weight:bold">Correct answer: {{choice.choice_text}}</label>
+                                        {% else %}
+                                            <label style="color:red;font-weight:bold">Wrong answer: {{choice.choice_text}}</label>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if choice.is_correct == True %}
+                                            <label style="color:yellow;font-weight:bold">Not selected: {{choice.choice_text}}</label>
+                                        {% else %}
+                                            <label>{{choice.choice_text}}</label>
+                                        {% endif %}
+                                        
+                                    {% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>   
+                    </div>
+                {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </body>
